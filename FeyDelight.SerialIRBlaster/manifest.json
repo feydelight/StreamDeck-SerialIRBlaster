@@ -52,11 +52,11 @@
       "PropertyInspectorPath": "PropertyInspector/DisconnectAll.html"
     }
   ],
-  "Author": "FinkiePie",
+  "Author": "FeyDelight",
   "Description": "Allow a serial controlled IR blaster to be configured. This allows sending multiple actions after eachother.",
   "Name": "Serial IR Blaster",
   "Icon": "Images/categoryIcon",
-  "URL": "https://feydelight.com/",
+  "URL": "https://github.com/feydelight/StreamDeck-SerialIRBlaster",
   "Version": "1.0",
   "CodePath": "FeyDelight.SerialIRBlaster.exe",
   "Category": "IR Blaster [feydelight]",

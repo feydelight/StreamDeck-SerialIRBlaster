@@ -1,5 +1,9 @@
-# StreamDeck Plugin - Serial IRBlaster
-This plugin sets the foundation for working with any serial devices. In this example, an Arduino nano v3 was used as the receving serial device, which has the ability to transmit IR signals, decode IR signals, and change settings. Its sketch can be found [here](https://github.com/feydelight/IRDecoderAndBlaster) 
+# FeyDelight's StreamDeck Plugin - Serial IRBlaster
+
+This plugin sets the foundation for working with any serial devices. 
+In this example, an Arduino nano v3 was used as the receving serial device, 
+which has the ability to transmit IR signals, decode IR signals, and change 
+settings. Its sketch can be found [here](https://github.com/feydelight/IRDecoderAndBlaster). 
 
 ## Features
 This plugin allows you to:
