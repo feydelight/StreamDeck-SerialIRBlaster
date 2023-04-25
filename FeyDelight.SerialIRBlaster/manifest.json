@@ -1,0 +1,74 @@
+{
+  "Actions": [
+    {
+      "Icon": "Images/singleIRIcon",
+      "Name": "Single IR Command",
+      "States": [
+        {
+          "Image": "Images/singleIRIcon",
+          "TitleAlignment": "bottom",
+          "FontSize": "11"
+        }
+      ],
+      "SupportedInMultiActions": true,
+      "DisableCaching": true,
+      "UserTitleEnabled": false,
+      "Tooltip": "Single IR Command - Allows you to send one command through the IR blaster, like the power button or the volume up/down buttons.",
+      "UUID": "com.feydelight.serialirblaster.singleircommand",
+      "PropertyInspectorPath": "PropertyInspector/SingleIRBlaster.html"
+    },
+    {
+      "Icon": "Images/multiIRIcon",
+      "Name": "Multiple IR Command",
+      "States": [
+        {
+          "Image": "Images/multiIRIcon",
+          "TitleAlignment": "bottom",
+          "FontSize": "11"
+        }
+      ],
+      "SupportedInMultiActions": true,
+      "DisableCaching": true,
+      "UserTitleEnabled": false,
+      "Tooltip": "Multiple IR Command - Allows you to send multiple commands through the IR blaster, like the power button or the volume up/down buttons.",
+      "UUID": "com.feydelight.serialirblaster.multiircommand",
+      "PropertyInspectorPath": "PropertyInspector/MultiIRBlaster.html"
+    },
+    {
+      "Icon": "Images/disconnectIcon",
+      "Name": "Disconnect",
+      "States": [
+        {
+          "Image": "Images/disconnectIcon",
+          "TitleAlignment": "bottom",
+          "FontSize": "11"
+        }
+      ],
+      "SupportedInMultiActions": true,
+      "DisableCaching": true,
+      "UserTitleEnabled": false,
+      "Tooltip": "Disconnect from all connected ports. Use this if you need your Serial connections freed up (for example to upload a new Sketch to your arduino device)",
+      "UUID": "com.feydelight.serialirblaster.disconnectall",
+      "PropertyInspectorPath": "PropertyInspector/DisconnectAll.html"
+    }
+  ],
+  "Author": "FinkiePie",
+  "Description": "Allow a serial controlled IR blaster to be configured. This allows sending multiple actions after eachother.",
+  "Name": "Serial IR Blaster",
+  "Icon": "Images/categoryIcon",
+  "URL": "https://feydelight.com/",
+  "Version": "1.0",
+  "CodePath": "FeyDelight.SerialIRBlaster.exe",
+  "Category": "IR Blaster [feydelight]",
+  "CategoryIcon": "Images/categoryIcon",
+  "OS": [
+    {
+      "Platform": "windows",
+      "MinimumVersion": "10"
+    }
+  ],
+  "SDKVersion": 2,
+  "Software": {
+    "MinimumVersion": "6.0"
+  }
+}
