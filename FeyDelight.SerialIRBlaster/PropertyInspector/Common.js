@@ -3,7 +3,7 @@ function openFeyDelights() {
         const json = {
             'event': 'openUrl',
             'payload': {
-                'url': 'https://BarRaider.com'
+                'url': 'https://github.com/feydelight/StreamDeck-SerialIRBlaster'
             }
         };
         websocket.send(JSON.stringify(json));
