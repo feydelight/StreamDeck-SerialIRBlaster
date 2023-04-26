@@ -153,14 +153,14 @@ namespace FeyDelight.SerialIRBlaster.Actions
         }
 
         int triedToGetPort = 0;
-        protected async void TryToGetPort(SerialPortRequester requester, SerialDataReceivedEventHandler serialPort_DataReceived)
+        protected async void TryToGetPort(SerialPortRequester requester)
         {
             await Task.Delay(500);
-            var port = Program.SerialPortManager.GetSerialPort(requester, serialPort_DataReceived);
+            var port = Program.SerialPortManager.GetSerialPort(requester);
             if (port == null && triedToGetPort < 10)
             {
                 ++triedToGetPort;
-                TryToGetPort(requester, serialPort_DataReceived);
+                TryToGetPort(requester);
             }
         }
     }

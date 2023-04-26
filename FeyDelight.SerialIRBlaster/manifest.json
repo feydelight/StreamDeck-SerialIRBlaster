@@ -35,6 +35,23 @@
       "PropertyInspectorPath": "PropertyInspector/MultiIRBlaster.html"
     },
     {
+      "Icon": "Images/decodeIcon",
+      "Name": "Decode",
+      "States": [
+        {
+          "Image": "Images/decodeIcon",
+          "TitleAlignment": "bottom",
+          "FontSize": "11"
+        }
+      ],
+      "SupportedInMultiActions": true,
+      "DisableCaching": true,
+      "UserTitleEnabled": false,
+      "Tooltip": "Sets the serial device to Decode mode and shows decode code on the button.",
+      "UUID": "com.feydelight.serialirblaster.decodecommand",
+      "PropertyInspectorPath": "PropertyInspector/Decode.html"
+    },
+    {
       "Icon": "Images/disconnectIcon",
       "Name": "Disconnect",
       "States": [

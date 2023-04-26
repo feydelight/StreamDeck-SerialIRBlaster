@@ -1,0 +1,38 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name=viewport content="width=device-width,initial-scale=1,maximum-scale=1,minimum-scale=1,user-scalable=no,minimal-ui,viewport-fit=cover">
+    <meta name=apple-mobile-web-app-capable content=yes>
+    <meta name=apple-mobile-web-app-status-bar-style content=black>
+    <title>FeyDelight Serial IR Blaster Plugin</title>
+    <script src="./sdtools.common.js"></script>
+    <link rel="stylesheet" href="./sdpi.css">
+</head>
+<body>
+    <div class="sdpi-wrapper">
+        <details class="message info">
+            <summary>
+                For feedback/suggestions contact me at
+                <span class="linkspan" onclick="openFeyDelights()">https://github.com/feydelight/StreamDeck-SerialIRBlaster</span>
+            </summary>
+        </details>
+        <div class="sdpi-heading">
+            <button class="button" onclick="OpenSettings()">Add Serial Device</button>
+        </div>
+        <div class="sdpi-item" id="select_single">
+            <div class="sdpi-item-label">Serial Port</div>
+            <select class="sdpi-item-value select sdProperty" id="key" oninput="setSettings()">
+            </select>
+        </div>
+        <input class="sdpi-item-value sdProperty" type="hidden" id="id" oninput="setSettings();" />
+        
+        <div class="sdpi-heading">Decode</div>
+        
+        <div class="sdpi-item">
+            <div class="sdpi-item-label">Decode Time</div>
+            <input class="sdpi-item-value sdProperty" placeholder="decoding time. Default for 60 seconds" value="" id="decodeTime" oninput="setSettings()">
+        </div>
+    </div>
+</body>
+</html>

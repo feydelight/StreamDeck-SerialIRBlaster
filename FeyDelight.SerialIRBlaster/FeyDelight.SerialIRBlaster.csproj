@@ -36,6 +36,7 @@
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.IO.Compression" />
     <Reference Include="System.Management" />
     <Reference Include="System.Xml.Linq" />
@@ -49,6 +50,7 @@
     <Compile Include="Actions\DisconnectAll.cs" />
     <Compile Include="Actions\MultiIRCommand.cs" />
     <Compile Include="Actions\SerialIRBlasterBase.cs" />
+    <Compile Include="Actions\DecodeCommand.cs" />
     <Compile Include="Actions\SingleIRCommand.cs" />
     <Compile Include="Common\ISerialPortManager.cs" />
     <Compile Include="Common\SerialMessages\ISerialMessage.cs" />
@@ -67,6 +69,12 @@
   <ItemGroup>
     <None Include="App.config" />
     <Content Include="Definitions.txt" />
+    <Content Include="Images\decodeIcon%402x.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\decodeIcon.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Images\disconnectIcon%402x.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -107,6 +115,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="PropertyInspector\DisconnectAll.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="PropertyInspector\Decode.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="PropertyInspector\MultiIRBlaster.html">
