@@ -1,0 +1,446 @@
+@import 'https://fonts.googleapis.com/css?family=Quantico';
+@import 'https://fonts.googleapis.com/css?family=Roboto';
+
+:root {
+    --br-button-color: #5989f8;
+    --br-hover-color: #82d4ff;
+    --br-button-font-color: #FFFFFF;
+    --br-status-bar-active-color: #5989f8;
+    --br-status-bar-completed-color: #09243b;
+    --br-status-bar-count: 3;
+}
+
+html, body {
+    margin: 0px;
+    color: rgb(230, 230, 230);
+    background-color: #121212;
+    font-family: 'Roboto', 'Helvetica Light', 'Helvetica', Arial, sans-serif;
+    height: 100%;
+    -webkit-user-select: none;
+    user-select: none;
+    overflow: hidden;
+}
+
+h1, h2 {
+    text-align: center;
+}
+
+h1 {
+    margin-top: 10px;
+    margin-bottom: 10px;
+    font-size: 34px;
+    font-weight: normal;
+    line-height: 40px;
+}
+
+h2 {
+    color: rgb(150, 150, 150);
+    font-weight: 100;
+    margin-bottom: 5px;
+}
+
+.header {
+    padding-bottom: 5px;
+}
+
+#content {
+    padding: 0px 25px 15px 25px;
+    margin-top: 0px;
+}
+
+.main {
+    min-width: 620px;
+}
+
+@media (min-width: 620px) {
+    .main {
+        max-width: 620px;
+        height: 100%;
+        width: 100%;
+        display: table;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .center {
+        display: table-cell;
+        height: 100%;
+        vertical-align: middle;
+    }
+}
+
+.content-wrapper {
+    padding-left: 50px;
+    padding-right: 50px;
+    text-align: center;
+}
+
+p, li {
+    line-height: 1.5;
+    text-align: center;
+}
+
+.image150 {
+    width: auto;
+    height: 150px;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    padding-top: 5px;
+}
+
+.margin-top0 {
+    margin-top: 0px !important;
+}
+
+.marginLeft0 {
+    margin-left: 0px !important;
+}
+
+.hide {
+    display: none;
+}
+
+.linkspan {
+    cursor: pointer;
+    color: #7397d2;
+    text-decoration: underline;
+}
+
+.leftAlign {
+    text-align: left;
+}
+
+.small {
+    font-size: 13px;
+}
+
+.error {
+    color: #FF0000;
+}
+
+.bold {
+    font-weight: bold;
+}
+
+.nextStep {
+    font-weight: bold;
+    font-size: 14px;
+    font-style: italic;
+    text-align: center;
+    line-height: 21px;
+}
+
+/* <-- End Global Classes -->*/
+
+
+/* Icon Bar */
+
+.icon-bar {
+    display: table;
+    width: 100%;
+    height: 100px;
+    border-spacing: 3px;
+    border-collapse: separate;
+}
+
+.app-logo {
+    height: 50px;
+    width: 50px;
+    position: absolute;
+    top: 26px;
+    left: 30px;
+    background-image: url("../../images/categoryIcon@2x.png");
+    background-repeat: no-repeat;
+    background-size: contain;
+}
+
+.app-over {
+    height: 50px;
+    width: 80%;
+    position: absolute;
+    top: 48px;
+    left: 100px;
+    font-size: 25px;
+}
+
+.info {
+    font-size: 12px;
+    width: 100%;
+}
+
+.info > table {
+    width: 80%;
+    table-layout: auto;
+}
+
+.ellipseStart, .ellipseFail {
+    background-repeat: no-repeat;
+    position: absolute;
+    height: 107px;
+    width: 150px;
+    z-index: 1;
+}
+
+.ellipseStart {
+    background-image: url("../images/ellipse.svg");
+}
+
+.ellipseFail {
+    background-image: url("../images/ellipseFail.svg");
+}
+
+.ellipseTopLeft {
+    top: -9px;
+    left: 138px;
+    transform-origin: center;
+    transform: rotate(3deg);
+}
+
+.ellipseBottomRight {
+    top: 60px;
+    right: 138px;
+    transform-origin: center;
+    transform: rotate(183deg);
+}
+
+.borderDone {
+    border: 10px solid #1652FF;
+    border-radius: 107px;
+}
+
+.borderLink {
+    position: absolute;
+    border-bottom: 10px dotted #1652FF;
+    width: 10px;
+    bottom: 0;
+    height: 10px;
+    top: 70px;
+    left: 303px;
+}
+
+.success {
+    color: #1ED760;
+}
+
+/*<-- End Icon Bar -->*/
+
+/* Status Bar */
+
+.status-bar {
+    display: table;
+    width: 100%;
+    border-spacing: 3px;
+    border-collapse: separate;
+    padding: 10px 0px 47px 0px;
+}
+
+.status-row, .title-row {
+    display: table-row;
+}
+
+.title-cell {
+    display: table-cell;
+    font-weight: 700;
+    font-size: 20px;
+    height: 28px;
+    color: #7F7F7F;
+    text-align: center;
+    line-height: 44px;
+}
+
+    .title-cell.active {
+        color: white;
+    }
+
+.status-cell {
+    display: table-cell;
+    background-color: rgb(61, 61, 61);
+    height: 10px;
+    width: calc(100% / var(--br-status-bar-count));
+}
+
+    .status-cell.active {
+        background-color: var(--br-status-bar-active-color);
+    }
+
+    .status-cell.completed {
+        background-color: var(--br-status-bar-completed-color);
+    }
+/*<-- End Status Bar -->*/
+
+/* Buttons */
+
+.button, .button-transparent {
+    display: table;
+    margin: 8px auto;
+    cursor: pointer;
+}
+
+.button {
+    border-radius: 3px;
+    background-color: var(--br-button-color);
+    color: var(--br-button-font-color);
+    height: auto;
+    width: 300px;
+    text-transform: capitalize;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
+    font-size: 16px;
+    text-align: center;
+    letter-spacing: 0.115em;
+}
+
+    .button:hover {
+        background-color: var(--br-hover-color);
+    }
+
+.button-transparent {
+    color: #7F7F7F;
+}
+
+    .button-transparent:hover {
+        color: rgb(150, 150, 150);
+    }
+
+
+.button.twitter, .button.discord {
+    display: inline-flex;
+    margin-left: 30px;
+    height: 59px;
+    width: 232px;
+}
+
+    .button.twitter > img, .button.discord > img {
+        margin-right: 10px;
+    }
+
+.button.twitter {
+    background-color: #00ACEE;
+}
+
+.button.discord {
+    background-color: #7289DA;
+}
+
+
+
+/*<-- End Buttons -->*/
+
+.content-wrapper >label {
+    width: 150px;
+    display: inline-block
+}
+
+.select {
+    width: 200px;
+}
+
+.textbox {
+    background: #FFFFFF;
+    border-radius: 1px;
+    border-block-end-style: none;
+    border-block-start-width: 0px;
+    border-inline-end-style: none;
+    border-inline-start-width: 0px;
+    caret-color: #000000;
+    color: #000000;
+    width: 200px;
+}
+
+::-webkit-input-placeholder {
+    font-weight: 900 !important;
+}
+
+::-moz-placeholder {
+    font-weight: 900 !important;
+}
+/* firefox 19+ */
+:-ms-input-placeholder {
+    font-weight: 900 !important;
+}
+/* ie */
+input:-moz-placeholder {
+    font-weight: 900 !important;
+}
+/*<-- End Text Boxes -->*/
+
+#loader {
+    width: 40px;
+    height: 40px;
+    background-color: var(--br-button-color);
+    margin: 20px auto;
+    -webkit-animation: sk-rotateplane 1.2s infinite ease-in-out;
+    animation: sk-rotateplane 1.2s infinite ease-in-out;
+}
+
+@-webkit-keyframes sk-rotateplane {
+    0% {
+        -webkit-transform: perspective(120px)
+    }
+
+    50% {
+        -webkit-transform: perspective(120px) rotateY(180deg)
+    }
+
+    100% {
+        -webkit-transform: perspective(120px) rotateY(180deg) rotateX(180deg)
+    }
+}
+
+@keyframes sk-rotateplane {
+    0% {
+        transform: perspective(120px) rotateX(0deg) rotateY(0deg);
+        -webkit-transform: perspective(120px) rotateX(0deg) rotateY(0deg)
+    }
+
+    50% {
+        transform: perspective(120px) rotateX(-180.1deg) rotateY(0deg);
+        -webkit-transform: perspective(120px) rotateX(-180.1deg) rotateY(0deg)
+    }
+
+    100% {
+        transform: perspective(120px) rotateX(-180deg) rotateY(-179.9deg);
+        -webkit-transform: perspective(120px) rotateX(-180deg) rotateY(-179.9deg);
+    }
+}
+/*<-- End Loading Animation -->*/
+
+/* BarRaider final box*/
+#bar-box {
+    border-spacing: 3px;
+    border-collapse: separate;
+    background-color: #282828;
+    padding: 10px 0px 15px 0px;
+    margin: 0px 36px 0px 36px;
+}
+
+#bar-box-title {
+    margin-bottom: 0px;
+}
+
+.bar-box-font {
+    font-family: Roboto;
+}
+
+.bar-logo {
+    height: 75px;
+    margin-top: 0px;
+    background-position: center;
+    background-image: url("../images/brLogoSmall.png");
+    background-repeat: no-repeat;
+    background-position-x: 140px;
+    color: white;
+    padding-left: 70px;
+    font-family: Quantico;
+    font-size: 38px;
+    font-style: normal;
+    font-weight: 700;
+    line-height: 70px;
+    letter-spacing: 0em;
+    text-align: center;
+}
+/*<-- End BarRaider Final Box -->*/

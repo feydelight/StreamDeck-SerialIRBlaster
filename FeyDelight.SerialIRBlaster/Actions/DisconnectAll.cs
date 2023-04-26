@@ -18,7 +18,7 @@ using System.Xml.Linq;
 namespace FeyDelight.SerialIRBlaster.Actions
 {
     [PluginActionId("com.feydelight.serialirblaster.disconnectall")]
-    class DisconnectAll : KeypadBase
+    class DisconnectAll : SerialIRBlasterBase
     {
         private class PluginSettings
         {
@@ -49,6 +49,7 @@ namespace FeyDelight.SerialIRBlaster.Actions
 
         public override void Dispose()
         {
+            base.Dispose();
         }
 
         public override void KeyPressed(KeyPayload payload)
