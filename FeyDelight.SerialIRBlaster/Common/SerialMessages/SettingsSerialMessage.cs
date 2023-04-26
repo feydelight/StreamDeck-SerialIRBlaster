@@ -22,7 +22,7 @@ namespace FeyDelight.SerialIRBlaster.Common.SerialMessages
 
         public override string GetPayload()
         {
-            return base.GetPayload($"{DecodeSignals},{DebugMode},{Reply}");
+            return base.GetPayload($"{DecodeSignals},{DebugMode},{Reply}".ToLower());
         }
 
         public override string ToString()

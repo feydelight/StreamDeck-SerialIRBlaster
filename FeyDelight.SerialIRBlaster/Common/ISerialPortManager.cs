@@ -14,16 +14,14 @@ namespace FeyDelight.SerialIRBlaster.Common
         /// Retrieves a serial port. If the port is not yet opened, it will attempt to open it.
         /// </summary>
         /// <param name="Requester"></param>
-        /// <param name="serialPort_DataReceived"></param>
         /// <returns>Returns null if the port failed to open</returns>
-        SerialPort GetSerialPort(SerialPortRequester Requester, SerialDataReceivedEventHandler serialPort_DataReceived);
+        SerialPort GetSerialPort(SerialPortRequester Requester);
         
         /// <summary>
         /// Closes a serial port. Continues to keep record of the settings for future use
         /// </summary>
         /// <param name="Requester"></param>
-        /// <param name="serialPort_DataReceived"></param>
-        void CloseSerialPort(SerialPortRequester Requester, SerialDataReceivedEventHandler serialPort_DataReceived);
+        void CloseSerialPort(SerialPortRequester Requester);
         
         /// <summary>
         /// Adds serial port settings to the list of available serialports

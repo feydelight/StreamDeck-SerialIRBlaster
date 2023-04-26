@@ -82,7 +82,7 @@ namespace FeyDelight.SerialIRBlaster.Common
             }
         }
 
-        public SerialPort GetSerialPort(SerialPortRequester requester, SerialDataReceivedEventHandler serialPort_DataReceived)
+        public SerialPort GetSerialPort(SerialPortRequester requester)
         {
             var key = requester.Key;
             if (string.IsNullOrEmpty(key))
@@ -117,8 +117,6 @@ namespace FeyDelight.SerialIRBlaster.Common
                     }
                 }
                 portCache.ConnectedActions.Add(requester.ID);
-                portCache.SerialPort.DataReceived -= serialPort_DataReceived;
-                portCache.SerialPort.DataReceived += serialPort_DataReceived;
 
                 if (portCache.SerialPort.IsOpen == false)
                 {
@@ -139,7 +137,7 @@ namespace FeyDelight.SerialIRBlaster.Common
         }
 
 
-        public void CloseSerialPort(SerialPortRequester requester, SerialDataReceivedEventHandler serialPort_DataReceived)
+        public void CloseSerialPort(SerialPortRequester requester)
         {
             var key = requester.Key;
             if (string.IsNullOrEmpty(key))
@@ -161,10 +159,6 @@ namespace FeyDelight.SerialIRBlaster.Common
 
                     if (port.ConnectedActions.Count > 0)
                     {
-                        if (port.SerialPort != null)
-                        {
-                            port.SerialPort.DataReceived -= serialPort_DataReceived;
-                        }
                         return;
                     }
                     Logger.Instance.LogMessage(TracingLevel.INFO, $"No other Actions connected. Closing {key}...");

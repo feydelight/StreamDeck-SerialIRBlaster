@@ -72,13 +72,13 @@ namespace FeyDelight.SerialIRBlaster.Actions
                     this.ID = this.settings.ID;
                 }
             }
-            base.TryToGetPort(this.settings, SerialPort_DataReceived);
+            base.TryToGetPort(this.settings);
         }
 
         public async override void KeyPressed(KeyPayload payload)
         {
             Logger.Instance.LogMessage(TracingLevel.INFO, $"{this.GetType()} {nameof(KeyPressed)}");
-            var serialPort = Program.SerialPortManager.GetSerialPort(settings, SerialPort_DataReceived);
+            var serialPort = Program.SerialPortManager.GetSerialPort(settings);
             if (serialPort == null)
             {
                 await Connection.ShowAlert();
@@ -112,20 +112,6 @@ namespace FeyDelight.SerialIRBlaster.Actions
         {
         }
 
-        private void SerialPort_DataReceived(object sender, SerialDataReceivedEventArgs e)
-        {
-            SerialPort sp = (SerialPort)sender;
-            try
-            {
-                string indata = sp.ReadLine().Trim();
-                Logger.Instance.LogMessage(TracingLevel.INFO, $"Serial replied: {indata}");
-            }
-            catch (Exception)
-            {
-                // either timed out, or the port got closed. either way, no biggy.
-                return;
-            }
-        }
 
         public override void OnTick()
         {
@@ -136,7 +122,7 @@ namespace FeyDelight.SerialIRBlaster.Actions
         {
             base.Dispose();
             Logger.Instance.LogMessage(TracingLevel.INFO, "Destructor called");
-            Program.SerialPortManager.CloseSerialPort(settings, SerialPort_DataReceived);
+            Program.SerialPortManager.CloseSerialPort(settings);
         }
 
         public override async void ReceivedSettings(ReceivedSettingsPayload payload)
