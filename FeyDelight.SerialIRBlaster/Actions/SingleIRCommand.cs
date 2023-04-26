@@ -18,9 +18,9 @@ using System.Xml.Linq;
 namespace FeyDelight.SerialIRBlaster.Actions
 {
     [PluginActionId("com.feydelight.serialirblaster.singleircommand")]
-    class SingleIRCommand : KeypadBase
+    class SingleIRCommand : SerialIRBlasterBase
     {
-        private class PluginSettings : SerialPortSettings
+        private class PluginSettings : SerialPortRequester
         {
             public PluginSettings(Guid ID)
                 : base(ID)
@@ -54,7 +54,6 @@ namespace FeyDelight.SerialIRBlaster.Actions
         public SingleIRCommand(SDConnection connection, InitialPayload payload)
             : base(connection, payload)
         {
-            Connection.StreamDeckConnection.OnPropertyInspectorDidAppear += StreamDeckConnection_OnPropertyInspectorDidAppear;
             if (payload.Settings == null || payload.Settings.Count == 0)
             {
                 this.settings = PluginSettings.CreateDefaultSettings(ID);
@@ -66,31 +65,23 @@ namespace FeyDelight.SerialIRBlaster.Actions
                 if (this.settings.ID == Guid.Empty)
                 {
                     this.settings.ID = ID;
+                    SaveSettings();
                 }
                 else
                 {
                     this.ID = this.settings.ID;
                 }
             }
-
-            Program.SerialPortManager.GetSerialPort(this.settings, SerialPort_DataReceived);
+            base.TryToGetPort(this.settings, SerialPort_DataReceived);
         }
 
-        private async void StreamDeckConnection_OnPropertyInspectorDidAppear(object sender, SDEventReceivedEventArgs<PropertyInspectorDidAppearEvent> e)
-        {
-            var serials = SerialNameAndId.GetSerialNameAndIds();
-            await Connection.SendToPropertyInspectorAsync(JObject.FromObject(new
-            {
-                serials
-            }));
-        }
-
-        public override void KeyPressed(KeyPayload payload)
+        public async override void KeyPressed(KeyPayload payload)
         {
             Logger.Instance.LogMessage(TracingLevel.INFO, $"{this.GetType()} {nameof(KeyPressed)}");
             var serialPort = Program.SerialPortManager.GetSerialPort(settings, SerialPort_DataReceived);
             if (serialPort == null)
             {
+                await Connection.ShowAlert();
                 return;
             }
 
@@ -109,15 +100,16 @@ namespace FeyDelight.SerialIRBlaster.Actions
                 Logger.Instance.LogMessage(TracingLevel.ERROR, $"Failed to get message out of settings");
                 Logger.Instance.LogMessage(TracingLevel.ERROR, $"{e}");
                 Logger.Instance.LogMessage(TracingLevel.ERROR, JsonConvert.SerializeObject(settings));
+                await Connection.ShowAlert();
                 return;
             }
             Logger.Instance.LogMessage(TracingLevel.INFO, $"Sending: {message}");
             serialPort.Write(message.GetPayload());
+            await Connection.ShowOk();
         }
 
         public override void KeyReleased(KeyPayload payload)
         {
-            Logger.Instance.LogMessage(TracingLevel.INFO, $"{this.GetType()} {nameof(KeyReleased)}");
         }
 
         private void SerialPort_DataReceived(object sender, SerialDataReceivedEventArgs e)
@@ -142,26 +134,15 @@ namespace FeyDelight.SerialIRBlaster.Actions
 
         public override void Dispose()
         {
+            base.Dispose();
             Logger.Instance.LogMessage(TracingLevel.INFO, "Destructor called");
-            Connection.StreamDeckConnection.OnPropertyInspectorDidAppear -= StreamDeckConnection_OnPropertyInspectorDidAppear;
             Program.SerialPortManager.CloseSerialPort(settings, SerialPort_DataReceived);
         }
 
         public override async void ReceivedSettings(ReceivedSettingsPayload payload)
         {
             Logger.Instance.LogMessage(TracingLevel.INFO, $"{this.GetType()} {nameof(ReceivedSettings)}");
-            bool reOpen = false;
-            if (settings.IsEqualTo(payload.Settings) == false)
-            {
-                Logger.Instance.LogMessage(TracingLevel.INFO, $"ComPort Changed. re-opening");
-                reOpen = true;
-                Program.SerialPortManager.CloseSerialPort(settings, SerialPort_DataReceived);
-            }
             Tools.AutoPopulateSettings(settings, payload.Settings);
-            if (reOpen)
-            {
-                Program.SerialPortManager.GetSerialPort(settings, SerialPort_DataReceived);
-            }
             await SaveSettings();
         }
 
