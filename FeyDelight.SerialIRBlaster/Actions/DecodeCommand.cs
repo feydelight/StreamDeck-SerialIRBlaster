@@ -72,30 +72,26 @@ namespace FeyDelight.SerialIRBlaster.Actions
             {
                 decodeTime = 60;
             }
-            base.TryToGetPort(this.settings);
+            base.TryToGetPort(this.settings, SerialPort_DataReceived);
         }
 
-        DateTimeOffset endOfChecking { get; set; }
-        bool removeTrigger = false;
+        DateTimeOffset EndOfChecking { get; set; }
+
         public async override void KeyPressed(KeyPayload payload)
         {
             Logger.Instance.LogMessage(TracingLevel.INFO, $"{this.GetType()} {nameof(KeyPressed)}");
-            var serialPort = Program.SerialPortManager.GetSerialPort(settings);
+            var serialPort = Program.SerialPortManager.GetSerialPort(settings, SerialPort_DataReceived);
             if (serialPort == null)
             {
                 Logger.Instance.LogMessage(TracingLevel.INFO, $"Failed to get the serial port");
                 await Connection.ShowAlert();
                 return;
             }
-
-
             SettingsSerialMessage message = new SettingsSerialMessage(true, false, true);
             Logger.Instance.LogMessage(TracingLevel.INFO, $"Sending: {message}");
-            serialPort.DataReceived += SerialPort_DataReceived;
             serialPort.Write(message.GetPayload());
-            endOfChecking = DateTimeOffset.Now.AddSeconds(decodeTime);
-            removeTrigger = true;
-            Logger.Instance.LogMessage(TracingLevel.INFO, $"Checking for decoded messages till {endOfChecking}. Currently {DateTimeOffset.Now}");
+            EndOfChecking = DateTimeOffset.Now.AddSeconds(decodeTime);
+            Logger.Instance.LogMessage(TracingLevel.INFO, $"Checking for decoded messages till {EndOfChecking}. Currently {DateTimeOffset.Now}");
             await Connection.ShowOk();
         }
 
@@ -103,24 +99,18 @@ namespace FeyDelight.SerialIRBlaster.Actions
         {
         }
 
-        private void SerialPort_DataReceived(object sender, SerialDataReceivedEventArgs e)
+        private void SerialPort_DataReceived(SerialPort sender, string line)
         {
-            SerialPort sp = (SerialPort)sender;
-            try
+            if (string.IsNullOrEmpty(line))
             {
-                string indata = sp.ReadLine().Trim();
-                Logger.Instance.LogMessage(TracingLevel.INFO, $"[Decoder] Serial replied: {indata}");
-                if (DateTimeOffset.Now < endOfChecking)
-                {
-                    TryParseReturnData(indata);
-                }
-            }
-            catch (Exception)
-            {
-                // either timed out, or the port got closed. either way, no biggy.
                 return;
             }
+            if (DateTimeOffset.Now < EndOfChecking)
+            {
+                TryParseReturnData(line);
+            }
         }
+
         private void TryParseReturnData(string line)
         {
             /*
@@ -149,8 +139,8 @@ Send with: IrSender.sendNEC(0xFF02, 0xE2, <numberOfRepeats>);
         {
             const int STARTING_TEXT_Y = 3;
             const int BUFFER_Y = 16;
-            address = $"Addr: {address}";
-            command = $"Cmd: {command}";
+            address = $"Addr: {address} ";
+            command = $"Cmd: {command} ";
             try
             {
                 using (Bitmap bmp = Tools.GenerateGenericKeyImage(out Graphics graphics))
@@ -191,26 +181,12 @@ Send with: IrSender.sendNEC(0xFF02, 0xE2, <numberOfRepeats>);
 
         public override void OnTick()
         {
-            if (removeTrigger && DateTimeOffset.Now > endOfChecking)
-            {
-                removeTrigger = false;
-                var serialPort = Program.SerialPortManager.GetSerialPort(settings);
-                if (serialPort != null)
-                {
-                    serialPort.DataReceived -= SerialPort_DataReceived;
-                }
-            }
         }
 
         public override void Dispose()
         {
             base.Dispose();
             Logger.Instance.LogMessage(TracingLevel.INFO, "Destructor called");
-            var serialPort = Program.SerialPortManager.GetSerialPort(settings);
-            if (serialPort != null)
-            {
-                serialPort.DataReceived -= SerialPort_DataReceived;
-            }
             Program.SerialPortManager.CloseSerialPort(settings);
         }
 

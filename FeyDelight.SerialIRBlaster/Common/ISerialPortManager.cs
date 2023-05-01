@@ -3,8 +3,10 @@ using System;
 
 namespace FeyDelight.SerialIRBlaster.Common
 {
+    public delegate void ReplyDelegate(SerialPort Sender, string Line);
     internal interface ISerialPortManager
     {
+
         /// <summary>
         /// Closes all serial ports. Continues to keep record of the settings for future use
         /// </summary>
@@ -14,9 +16,10 @@ namespace FeyDelight.SerialIRBlaster.Common
         /// Retrieves a serial port. If the port is not yet opened, it will attempt to open it.
         /// </summary>
         /// <param name="Requester"></param>
+        /// <param name="replyDelegate">Event that you can subscribe to </param>
         /// <returns>Returns null if the port failed to open</returns>
-        SerialPort GetSerialPort(SerialPortRequester Requester);
-        
+        SerialPort GetSerialPort(SerialPortRequester requester, ReplyDelegate replyDelegate);
+
         /// <summary>
         /// Closes a serial port. Continues to keep record of the settings for future use
         /// </summary>

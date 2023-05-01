@@ -64,13 +64,13 @@ namespace FeyDelight.SerialIRBlaster.Actions
                     this.ID = this.settings.ID;
                 }
             }
-            base.TryToGetPort(this.settings);
+            base.TryToGetPort(this.settings, SerialPort_DataReceived);
         }
 
         public override async void KeyPressed(KeyPayload payload)
         {
             Logger.Instance.LogMessage(TracingLevel.INFO, $"{this.GetType()} {nameof(KeyPressed)}");
-            var serialPort = Program.SerialPortManager.GetSerialPort(settings);
+            var serialPort = Program.SerialPortManager.GetSerialPort(settings, SerialPort_DataReceived);
             if (serialPort == null)
             {
                 await Connection.ShowAlert();
@@ -116,7 +116,14 @@ namespace FeyDelight.SerialIRBlaster.Actions
         {
         }
 
-
+        private void SerialPort_DataReceived(SerialPort sender, string line)
+        {
+            if (string.IsNullOrEmpty(line))
+            {
+                return;
+            }
+            // do a sanity check to see if its finished
+        }
 
         public override void OnTick()
         {
