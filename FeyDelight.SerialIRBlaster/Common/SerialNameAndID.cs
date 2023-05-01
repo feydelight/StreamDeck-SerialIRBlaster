@@ -26,30 +26,43 @@ namespace FeyDelight.SerialIRBlaster.Common
 
         public static List<SerialNameAndId> GetSerialNameAndIds()
         {
-            ManagementScope connectionScope = new ManagementScope();
-            SelectQuery serialQuery = new SelectQuery("SELECT * FROM Win32_SerialPort");
-            ManagementObjectSearcher searcher = new ManagementObjectSearcher(connectionScope, serialQuery);
-
             List<SerialNameAndId> serials = new List<SerialNameAndId>();
+            string[] ports = SerialPort.GetPortNames();
+            foreach (string port in ports)
+            {
+                serials.Add(new SerialNameAndId(port, port));
+            }
+
+            var serialsWithDesc = new List<SerialNameAndId>();
             try
             {
+                ManagementScope connectionScope = new ManagementScope();
+                SelectQuery serialQuery = new SelectQuery("SELECT * FROM Win32_SerialPort");
+                ManagementObjectSearcher searcher = new ManagementObjectSearcher(connectionScope, serialQuery);
+
                 foreach (ManagementObject item in searcher.Get().Cast<ManagementObject>())
                 {
                     string desc = item["Description"].ToString();
                     string deviceId = item["DeviceID"].ToString();
-                    serials.Add(new SerialNameAndId(desc, deviceId));
+                    serialsWithDesc.Add(new SerialNameAndId(desc, deviceId));
                 }
             }
             catch (ManagementException)
             {
+
             }
 
-            if (serials.Count == 0)
+            foreach (var namedSerial in serialsWithDesc)
             {
-                string[] ports = SerialPort.GetPortNames();
-                foreach (string port in ports)
+                int index = serials.FindIndex(serial => serial.DeviceID == namedSerial.DeviceID);
+                if (index == -1)
                 {
-                    serials.Add(new SerialNameAndId(port, port));
+                    // shouldn't happen but will leave it for safety
+                    serials.Add(namedSerial);
+                }
+                else
+                {
+                    serials[index].Description = namedSerial.Description;
                 }
             }
 
