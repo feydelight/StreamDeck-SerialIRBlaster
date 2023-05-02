@@ -96,6 +96,7 @@ namespace FeyDelight.SerialIRBlaster.Common
             }
             lock (dictLock)
             {
+                Logger.Instance.LogMessage(TracingLevel.INFO, $"ID {requester.ID} requesting port: {key}");
                 if (PortCaches.TryGetValue(key, out var portCache) == false)
                 {
                     Logger.Instance.LogMessage(TracingLevel.INFO, $"Requesting port that doesn't exist or has been deleted {requester.ID}");
@@ -156,14 +157,14 @@ namespace FeyDelight.SerialIRBlaster.Common
                         Logger.Instance.LogMessage(TracingLevel.INFO, $"Port {key} sent messages after it was asked to be closed.");
                         return;
                     }
-                    Logger.Instance.LogMessage(TracingLevel.INFO, $"Serial replied: '{indata}'");
+                    //Logger.Instance.LogMessage(TracingLevel.INFO, $"Serial replied: '{indata}'");
                     foreach(var action in portCache.ConnectedActions)
                     {
                         if (action.Value == null)
                         {
                             continue;
                         }
-                        Logger.Instance.LogMessage(TracingLevel.INFO, $"Sending it to: {action.Key}");
+                        //Logger.Instance.LogMessage(TracingLevel.INFO, $"Sending it to: {action.Key}");
                         action.Value.Invoke(sp, indata);
                     }
                 }

@@ -68,31 +68,24 @@ namespace FeyDelight.SerialIRBlaster.Actions
 
         public async override void ReceivedGlobalSettings(ReceivedGlobalSettingsPayload payload)
         {
-            Logger.Instance.LogMessage(TracingLevel.INFO, $"{this.GetType()}.{nameof(ReceivedGlobalSettings)}");
-            // existing settings
             if (payload?.Settings != null && payload.Settings.Count > 0)
             {
-                Logger.Instance.LogMessage(TracingLevel.INFO, $"previous setting available, retrieving...");
                 globalSettings = payload.Settings.ToObject<GlobalSettings>();
                 if (globalSettings.SerialPortSettings == null)
                 {
                     globalSettings.SerialPortSettings = new Dictionary<string, SerialPortSettings>();
                 }
-                Logger.Instance.LogMessage(TracingLevel.INFO, $"retrieved.");
             }
             else
             {
-                Logger.Instance.LogMessage(TracingLevel.INFO, $"no settings available, creating one...");
                 globalSettings = new GlobalSettings()
                 {
                     SerialPortSettings = new Dictionary<string, SerialPortSettings>(),
                 };
                 await SetGlobalSettings();
-                Logger.Instance.LogMessage(TracingLevel.INFO, $"done.");
             }
 
 
-            Logger.Instance.LogMessage(TracingLevel.INFO, $"creating all sockets");
             if (globalSettings.SerialPortSettings.Count > 0)
             {
                 foreach (var setting in globalSettings.SerialPortSettings)
@@ -100,8 +93,6 @@ namespace FeyDelight.SerialIRBlaster.Actions
                     Program.SerialPortManager.AddSerialPort(setting.Value);
                 }
             }
-
-            Logger.Instance.LogMessage(TracingLevel.INFO, $"done.");
 
             Settings.Serials = this.GetSerialPortSettingsList();
             await SaveSettings();
@@ -175,6 +166,16 @@ namespace FeyDelight.SerialIRBlaster.Actions
             Connection.OnSendToPlugin -= Connection_OnSendToPlugin;
         }
 
+
+        protected virtual void SerialPort_DataReceived(SerialPort sender, string line)
+        {
+            if (string.IsNullOrEmpty(line))
+            {
+                return;
+            }
+            // do a sanity check to see if its finished
+        }
+
         private Task SetGlobalSettings()
         {
 
@@ -186,10 +187,10 @@ namespace FeyDelight.SerialIRBlaster.Actions
         }
 
         int triedToGetPort = 0;
-        protected async void TryToGetPort(ReplyDelegate replyDelegate)
+        protected async void TryToGetPort()
         {
-            await Task.Delay(500);
-            var port = Program.SerialPortManager.GetSerialPort(Settings, replyDelegate);
+            await Task.Delay(1000);
+            var port = Program.SerialPortManager.GetSerialPort(Settings, SerialPort_DataReceived);
             if (port == null && triedToGetPort < 10)
             {
                 ++triedToGetPort;

@@ -28,7 +28,7 @@ namespace FeyDelight.SerialIRBlaster.Actions
             : base(connection, payload)
         {
             SaveSettings();
-            base.TryToGetPort(SerialPort_DataReceived);
+            base.TryToGetPort();
         }
 
         public async override void KeyPressed(KeyPayload payload)
@@ -66,15 +66,6 @@ namespace FeyDelight.SerialIRBlaster.Actions
 
         public override void KeyReleased(KeyPayload payload)
         {
-        }
-
-        private void SerialPort_DataReceived(SerialPort sender, string line)
-        {
-            if (string.IsNullOrEmpty(line))
-            {
-                return;
-            }
-            // do a sanity check to see if its finished
         }
 
         public override void OnTick()

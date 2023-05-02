@@ -18,7 +18,7 @@ namespace FeyDelight.SerialIRBlaster.Common
         /// <param name="Requester"></param>
         /// <param name="replyDelegate">Event that you can subscribe to </param>
         /// <returns>Returns null if the port failed to open</returns>
-        SerialPort GetSerialPort(SerialPortRequester requester, ReplyDelegate replyDelegate);
+        SerialPort GetSerialPort(ISerialPortRequester requester, ReplyDelegate replyDelegate);
 
         /// <summary>
         /// Closes a serial port. Continues to keep record of the settings for future use

@@ -37,7 +37,7 @@ namespace FeyDelight.SerialIRBlaster.Actions
                 Settings.DecodeTime = decodeTime.ToString();
             }
             SaveSettings();
-            base.TryToGetPort(SerialPort_DataReceived);
+            base.TryToGetPort();
         }
 
         DateTimeOffset EndOfChecking { get; set; }
@@ -64,12 +64,9 @@ namespace FeyDelight.SerialIRBlaster.Actions
         {
         }
 
-        private void SerialPort_DataReceived(SerialPort sender, string line)
+        protected override void SerialPort_DataReceived(SerialPort sender, string line)
         {
-            if (string.IsNullOrEmpty(line))
-            {
-                return;
-            }
+            base.SerialPort_DataReceived(sender, line);
             if (DateTimeOffset.Now < EndOfChecking)
             {
                 TryParseReturnData(line);
@@ -152,7 +149,7 @@ Send with: IrSender.sendNEC(0xFF02, 0xE2, <numberOfRepeats>);
         {
             base.Dispose();
             Logger.Instance.LogMessage(TracingLevel.INFO, "Destructor called");
-            Program.SerialPortManager.CloseSerialPort(settings);
+            Program.SerialPortManager.CloseSerialPort(Settings);
         }
 
         public override async void ReceivedSettings(ReceivedSettingsPayload payload)
