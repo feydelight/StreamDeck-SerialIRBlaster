@@ -28,7 +28,6 @@ namespace FeyDelight.SerialIRBlaster.Actions
         public MultiIRCommand(SDConnection connection, InitialPayload payload)
             : base(connection, payload)
         {
-            Settings = new MultiIRPluginSettings();
             SaveSettings();
             base.TryToGetPort();
         }
