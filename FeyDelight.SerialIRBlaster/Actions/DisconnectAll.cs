@@ -14,43 +14,21 @@ using FeyDelight.SerialIRBlaster.Common;
 using System.Security.Authentication;
 using FeyDelight.SerialIRBlaster.Common.SerialMessages;
 using System.Xml.Linq;
+using FeyDelight.SerialIRBlaster.PluginSettings;
 
 namespace FeyDelight.SerialIRBlaster.Actions
 {
     [PluginActionId("com.feydelight.serialirblaster.disconnectall")]
-    class DisconnectAll : SerialIRBlasterBase
+    class DisconnectAll : SerialIRBlasterBase<DisconnectAllPluginSettings>
     {
-        private class PluginSettings
-        {
-            public static PluginSettings CreateDefaultSettings()
-            {
-                return new PluginSettings()
-                {
-                };
-            }
-        }
-
-        private readonly PluginSettings settings;
+        protected override DisconnectAllPluginSettings Settings { get; set; }
 
         public DisconnectAll(SDConnection connection, InitialPayload payload)
             : base(connection, payload)
         {
-            // this button has not settings
-            if (payload.Settings == null || payload.Settings.Count == 0)
-            {
-                this.settings = PluginSettings.CreateDefaultSettings();
-                Connection.SetSettingsAsync(JObject.FromObject(settings));
-            }
-            else
-            {
-                this.settings = payload.Settings.ToObject<PluginSettings>();
-            }
+            SaveSettings();            
         }
 
-        public override void Dispose()
-        {
-            base.Dispose();
-        }
 
         public override void KeyPressed(KeyPayload payload)
         {
@@ -66,20 +44,6 @@ namespace FeyDelight.SerialIRBlaster.Actions
         {
         }
 
-        public override void ReceivedGlobalSettings(ReceivedGlobalSettingsPayload payload)
-        {
-        }
-
-        public override async  void ReceivedSettings(ReceivedSettingsPayload payload)
-        {
-            Tools.AutoPopulateSettings(settings, payload.Settings);
-            await SaveSettings();
-        }
-
-
-        private Task SaveSettings()
-        {
-            return Connection.SetSettingsAsync(JObject.FromObject(settings));
-        }
+         
     }
 }

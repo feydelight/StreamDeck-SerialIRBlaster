@@ -17,8 +17,12 @@ using FeyDelight.SerialIRBlaster.Common;
 
 namespace FeyDelight.SerialIRBlaster.Actions
 {
-    internal abstract class SerialIRBlasterBase : KeypadBase
+    internal abstract class SerialIRBlasterBase<T> : KeypadBase
+        where T : SerialPortRequester
     {
+        protected abstract T Settings { get; set; }
+        protected Guid ID { get; } = Guid.NewGuid();
+
         public class GlobalSettings
         {
             [JsonProperty(PropertyName = "serialPortSettings")]
@@ -29,15 +33,42 @@ namespace FeyDelight.SerialIRBlaster.Actions
         public SerialIRBlasterBase(SDConnection connection, InitialPayload payload)
             : base(connection, payload)
         {
+            if (payload.Settings == null || payload.Settings.Count == 0)
+            {
+                Settings = Activator.CreateInstance<T>();
+            }
+            else
+            {
+                Settings = payload.Settings.ToObject<T>(); 
+            }
+            if (Settings == null)
+            {
+                Logger.Instance.LogMessage(TracingLevel.DEBUG, $"Settings is null");
+                return;
+            }
+            if (Settings.ID == Guid.Empty)
+
+            {
+                Settings.ID = ID;
+            }
+            else
+            {
+                ID = Settings.ID;
+            }
+            Settings.Serials = this.GetSerialPortSettingsList();
             Connection.StreamDeckConnection.OnPropertyInspectorDidAppear += StreamDeckConnection_OnPropertyInspectorDidAppear;
             Connection.OnSendToPlugin += Connection_OnSendToPlugin;
-            GlobalSettingsManager.Instance.OnReceivedGlobalSettings += Instance_OnReceivedGlobalSettings;
             Connection.GetGlobalSettingsAsync();
         }
 
-        private async void Instance_OnReceivedGlobalSettings(object sender, ReceivedGlobalSettingsPayload payload)
+        public override void ReceivedSettings(ReceivedSettingsPayload payload)
         {
-            Logger.Instance.LogMessage(TracingLevel.INFO, $"{this.GetType()}.{nameof(Instance_OnReceivedGlobalSettings)}");
+            Tools.AutoPopulateSettings(Settings, payload.Settings);
+        }
+
+        public async override void ReceivedGlobalSettings(ReceivedGlobalSettingsPayload payload)
+        {
+            Logger.Instance.LogMessage(TracingLevel.INFO, $"{this.GetType()}.{nameof(ReceivedGlobalSettings)}");
             // existing settings
             if (payload?.Settings != null && payload.Settings.Count > 0)
             {
@@ -48,7 +79,7 @@ namespace FeyDelight.SerialIRBlaster.Actions
                     globalSettings.SerialPortSettings = new Dictionary<string, SerialPortSettings>();
                 }
                 Logger.Instance.LogMessage(TracingLevel.INFO, $"retrieved.");
-            } 
+            }
             else
             {
                 Logger.Instance.LogMessage(TracingLevel.INFO, $"no settings available, creating one...");
@@ -72,7 +103,10 @@ namespace FeyDelight.SerialIRBlaster.Actions
 
             Logger.Instance.LogMessage(TracingLevel.INFO, $"done.");
 
+            Settings.Serials = this.GetSerialPortSettingsList();
+            await SaveSettings();
         }
+
 
         private async void Connection_OnSendToPlugin(object sender, SDEventReceivedEventArgs<SendToPlugin> e)
         {
@@ -121,7 +155,7 @@ namespace FeyDelight.SerialIRBlaster.Actions
 
         private void StreamDeckConnection_OnPropertyInspectorDidAppear(object sender, SDEventReceivedEventArgs<PropertyInspectorDidAppearEvent> e)
         {
-            SendDataToPropertyInspector();
+            // SendDataToPropertyInspector();
         }
 
         private async void SendDataToPropertyInspector()
@@ -139,7 +173,6 @@ namespace FeyDelight.SerialIRBlaster.Actions
         {
             Connection.StreamDeckConnection.OnPropertyInspectorDidAppear -= StreamDeckConnection_OnPropertyInspectorDidAppear;
             Connection.OnSendToPlugin -= Connection_OnSendToPlugin;
-            GlobalSettingsManager.Instance.OnReceivedGlobalSettings -= Instance_OnReceivedGlobalSettings;
         }
 
         private Task SetGlobalSettings()
@@ -153,15 +186,25 @@ namespace FeyDelight.SerialIRBlaster.Actions
         }
 
         int triedToGetPort = 0;
-        protected async void TryToGetPort(SerialPortRequester requester, ReplyDelegate replyDelegate)
+        protected async void TryToGetPort(ReplyDelegate replyDelegate)
         {
             await Task.Delay(500);
-            var port = Program.SerialPortManager.GetSerialPort(requester, replyDelegate);
+            var port = Program.SerialPortManager.GetSerialPort(Settings, replyDelegate);
             if (port == null && triedToGetPort < 10)
             {
                 ++triedToGetPort;
-                TryToGetPort(requester, replyDelegate);
+                TryToGetPort();
             }
+        }
+
+        protected List<SerialPortSettings> GetSerialPortSettingsList()
+        {
+            return this.globalSettings?.SerialPortSettings?.Values.ToList();
+        }
+
+        protected Task SaveSettings()
+        {
+            return Connection.SetSettingsAsync(JObject.FromObject(Settings));
         }
     }
 }

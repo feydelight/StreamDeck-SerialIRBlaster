@@ -14,63 +14,29 @@ using FeyDelight.SerialIRBlaster.Common;
 using System.Security.Authentication;
 using FeyDelight.SerialIRBlaster.Common.SerialMessages;
 using System.Xml.Linq;
-
+using FeyDelight.SerialIRBlaster.PluginSettings;
 
 namespace FeyDelight.SerialIRBlaster.Actions
 {
     [PluginActionId("com.feydelight.serialirblaster.multiircommand")]
-    internal class MultiIRCommand : SerialIRBlasterBase
+    internal class MultiIRCommand : SerialIRBlasterBase<MultiIRPluginSettings>
     {
-        private class PluginSettings : SerialPortRequester
-        {
-            public PluginSettings(Guid ID)
-                : base(ID)
-            {
 
-            }
-            public static PluginSettings CreateDefaultSettings(Guid ID)
-            {
-                return new PluginSettings(ID)
-                {
-                    MultiCommand = "",
-                };
-            }
+        protected override MultiIRPluginSettings Settings { get; set; }
 
-            [JsonProperty(PropertyName = "multiCommand")]
-            public string MultiCommand { get; set; }
-        }
-
-        private readonly PluginSettings settings;
-        private Guid ID { get; } = Guid.NewGuid();
 
         public MultiIRCommand(SDConnection connection, InitialPayload payload)
             : base(connection, payload)
         {
-            if (payload.Settings == null || payload.Settings.Count == 0)
-            {
-                this.settings = PluginSettings.CreateDefaultSettings(ID);
-                Connection.SetSettingsAsync(JObject.FromObject(settings));
-            }
-            else
-            {
-                this.settings = payload.Settings.ToObject<PluginSettings>();
-                if (this.settings.ID == Guid.Empty)
-                {
-                    this.settings.ID = ID;
-                    SaveSettings();
-                }
-                else
-                {
-                    this.ID = this.settings.ID;
-                }
-            }
-            base.TryToGetPort(this.settings, SerialPort_DataReceived);
+            Settings = new MultiIRPluginSettings();
+            SaveSettings();
+            base.TryToGetPort(SerialPort_DataReceived);
         }
 
         public override async void KeyPressed(KeyPayload payload)
         {
             Logger.Instance.LogMessage(TracingLevel.INFO, $"{this.GetType()} {nameof(KeyPressed)}");
-            var serialPort = Program.SerialPortManager.GetSerialPort(settings, SerialPort_DataReceived);
+            var serialPort = Program.SerialPortManager.GetSerialPort(Settings, SerialPort_DataReceived);
             if (serialPort == null)
             {
                 await Connection.ShowAlert();
@@ -79,7 +45,7 @@ namespace FeyDelight.SerialIRBlaster.Actions
 
             List<IRBlastSerialMessage> messages = new List<IRBlastSerialMessage>();
 
-            string[] splitCommands = this.settings.MultiCommand?.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
+            string[] splitCommands = this.Settings.MultiCommand?.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
             if (splitCommands.Length == 0)
             {
                 await Connection.ShowAlert();
@@ -134,23 +100,15 @@ namespace FeyDelight.SerialIRBlaster.Actions
         {
             base.Dispose();
             Logger.Instance.LogMessage(TracingLevel.INFO, "Destructor called");
-            Program.SerialPortManager.CloseSerialPort(settings);
+            Program.SerialPortManager.CloseSerialPort(Settings);
         }
 
         public override async void ReceivedSettings(ReceivedSettingsPayload payload)
         {
-            Logger.Instance.LogMessage(TracingLevel.INFO, $"{this.GetType()} {nameof(ReceivedSettings)}");
-            Tools.AutoPopulateSettings(settings, payload.Settings);
+            base.ReceivedSettings(payload);
             await SaveSettings();
         }
 
-        public override void ReceivedGlobalSettings(ReceivedGlobalSettingsPayload payload)
-        {
-        }
 
-        private Task SaveSettings()
-        {
-            return Connection.SetSettingsAsync(JObject.FromObject(settings));
-        }
     }
 }
