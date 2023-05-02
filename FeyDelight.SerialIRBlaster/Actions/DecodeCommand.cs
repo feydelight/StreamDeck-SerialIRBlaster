@@ -16,63 +16,28 @@ using FeyDelight.SerialIRBlaster.Common.SerialMessages;
 using System.Xml.Linq;
 using System.Text.RegularExpressions;
 using System.Drawing;
+using FeyDelight.SerialIRBlaster.PluginSettings;
 
 namespace FeyDelight.SerialIRBlaster.Actions
 {
+
     [PluginActionId("com.feydelight.serialirblaster.decodecommand")]
-    class DecodeCommand : SerialIRBlasterBase
+    class DecodeCommand : SerialIRBlasterBase<DecodePluginSettings>
     {
-        private class PluginSettings : SerialPortRequester
-        {
-            public PluginSettings(Guid ID)
-                : base(ID)
-            {
-
-            }
-            public static PluginSettings CreateDefaultSettings(Guid ID)
-            {
-                return new PluginSettings(ID)
-                {
-                    DecodeTime = "60",
-                };
-            }
-
-            [JsonProperty(PropertyName = "decodeTime")]
-            public string DecodeTime { get; set; }
-
-        }
-
-        private readonly PluginSettings settings;
-        private Guid ID { get; } = Guid.NewGuid();
+        protected override DecodePluginSettings Settings { get; set; }        
 
         private int decodeTime;
 
         public DecodeCommand(SDConnection connection, InitialPayload payload)
             : base(connection, payload)
         {
-            if (payload.Settings == null || payload.Settings.Count == 0)
-            {
-                this.settings = PluginSettings.CreateDefaultSettings(ID);
-                Connection.SetSettingsAsync(JObject.FromObject(settings));
-            }
-            else
-            {
-                this.settings = payload.Settings.ToObject<PluginSettings>();
-                if (this.settings.ID == Guid.Empty)
-                {
-                    this.settings.ID = ID;
-                    SaveSettings();
-                }
-                else
-                {
-                    this.ID = this.settings.ID;
-                }
-            }
-            if (int.TryParse(settings.DecodeTime, out decodeTime) == false)
+            if (int.TryParse(Settings.DecodeTime, out decodeTime) == false)
             {
                 decodeTime = 60;
+                Settings.DecodeTime = decodeTime.ToString();
             }
-            base.TryToGetPort(this.settings);
+            SaveSettings();
+            base.TryToGetPort();
         }
 
         DateTimeOffset endOfChecking { get; set; }
@@ -80,7 +45,7 @@ namespace FeyDelight.SerialIRBlaster.Actions
         public async override void KeyPressed(KeyPayload payload)
         {
             Logger.Instance.LogMessage(TracingLevel.INFO, $"{this.GetType()} {nameof(KeyPressed)}");
-            var serialPort = Program.SerialPortManager.GetSerialPort(settings);
+            var serialPort = Program.SerialPortManager.GetSerialPort(Settings);
             if (serialPort == null)
             {
                 Logger.Instance.LogMessage(TracingLevel.INFO, $"Failed to get the serial port");
@@ -194,7 +159,7 @@ Send with: IrSender.sendNEC(0xFF02, 0xE2, <numberOfRepeats>);
             if (removeTrigger && DateTimeOffset.Now > endOfChecking)
             {
                 removeTrigger = false;
-                var serialPort = Program.SerialPortManager.GetSerialPort(settings);
+                var serialPort = Program.SerialPortManager.GetSerialPort(Settings);
                 if (serialPort != null)
                 {
                     serialPort.DataReceived -= SerialPort_DataReceived;
@@ -206,33 +171,23 @@ Send with: IrSender.sendNEC(0xFF02, 0xE2, <numberOfRepeats>);
         {
             base.Dispose();
             Logger.Instance.LogMessage(TracingLevel.INFO, "Destructor called");
-            var serialPort = Program.SerialPortManager.GetSerialPort(settings);
+            var serialPort = Program.SerialPortManager.GetSerialPort(Settings);
             if (serialPort != null)
             {
                 serialPort.DataReceived -= SerialPort_DataReceived;
             }
-            Program.SerialPortManager.CloseSerialPort(settings);
+            Program.SerialPortManager.CloseSerialPort(Settings);
         }
 
         public override async void ReceivedSettings(ReceivedSettingsPayload payload)
         {
-            Logger.Instance.LogMessage(TracingLevel.INFO, $"{this.GetType()} {nameof(ReceivedSettings)}");
-            Tools.AutoPopulateSettings(settings, payload.Settings);
-
-            if (int.TryParse(settings.DecodeTime, out decodeTime) == false)
+            base.ReceivedSettings(payload);
+            if (int.TryParse(Settings.DecodeTime, out decodeTime) == false)
             {
                 decodeTime = 60;
             }
             await SaveSettings();
         }
 
-        public override void ReceivedGlobalSettings(ReceivedGlobalSettingsPayload payload)
-        {
-        }
-
-        private Task SaveSettings()
-        {
-            return Connection.SetSettingsAsync(JObject.FromObject(settings));
-        }
     }
 }

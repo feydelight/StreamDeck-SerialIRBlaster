@@ -15,14 +15,14 @@ namespace FeyDelight.SerialIRBlaster.Common
         {
             public SerialPort SerialPort { get; set; }
             public HashSet<Guid> ConnectedActions { get; set; }
-            public SerialPortSettings SerialPortSettings { get; set; }
+            public ISerialPortSettings SerialPortSettings { get; set; }
         }
 
         readonly object dictLock = new object();
 
         Dictionary<string, SerialPortCache> PortCaches { get; } = new Dictionary<string, SerialPortCache>();
 
-        public bool AddSerialPort(SerialPortSettings settings)
+        public bool AddSerialPort(ISerialPortSettings settings)
         {
             var key = settings.ComPort;
             if (string.IsNullOrEmpty(key))
@@ -82,7 +82,7 @@ namespace FeyDelight.SerialIRBlaster.Common
             }
         }
 
-        public SerialPort GetSerialPort(SerialPortRequester requester)
+        public SerialPort GetSerialPort(ISerialPortRequester requester)
         {
             var key = requester.Key;
             if (string.IsNullOrEmpty(key))
@@ -137,7 +137,7 @@ namespace FeyDelight.SerialIRBlaster.Common
         }
 
 
-        public void CloseSerialPort(SerialPortRequester requester)
+        public void CloseSerialPort(ISerialPortRequester requester)
         {
             var key = requester.Key;
             if (string.IsNullOrEmpty(key))

@@ -72,8 +72,6 @@ function websocketOnMessage(evt) {
             Log('No configured serial ports found. Wait for setup');
             return;
         }
-        PopulateKeyDDL(serialPorts);
-
     }
     else {
         console.log("Ignored websocketOnMessage: " + jsonObj.event);
@@ -339,42 +337,6 @@ function fadeColor(col, amt) {
 
 var settingWindow;
 var globalSettings;
-function PopulateKeyDDL(serialPorts) {
-    var ddl = document.getElementById('key');
-    if (ddl == null) {
-        Log('Drop down \'key\' not found.');
-        return;
-    }
-
-    Log('Removing all unselected items...');
-    // remove everything but the selected item
-    for (var i = 0; i < ddl.options.length; ++i) {
-        var opt = ddl.options[i];
-        if (opt.selected == false) {
-            ddl.options.remove(i);
-            --i;
-        }
-    }
-
-    Log('Adding all available serials...')
-    // add the rest of the options.
-    var opts = ddl.selectedOptions;
-    Object.keys(serialPorts).forEach(function (key) {
-        var val = serialPorts[key];
-        if (val) {
-            var desc = val.displayName
-            if (opts.length > 0 && opts[0].value == key) {
-                // update the selected item's description
-                Log('Selected Item ' + key + ' was found. Updating its description: ' + desc);
-                opts[0].text = desc;
-            } else {
-                Log('Adding new item: ' + key + ':' + desc);
-                var opt = new Option(desc, key, false, false);
-                ddl.options.add(opt);
-            }
-        }
-    });
-}
 
 function GetGlobalSettings() {
     return globalSettings ?? null;

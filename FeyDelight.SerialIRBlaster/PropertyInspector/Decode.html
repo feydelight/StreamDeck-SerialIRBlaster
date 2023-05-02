@@ -22,7 +22,8 @@
         </div>
         <div class="sdpi-item" id="select_single">
             <div class="sdpi-item-label">Serial Port</div>
-            <select class="sdpi-item-value select sdProperty" id="key" oninput="setSettings()">
+            <select class="sdpi-item-value select sdProperty sdList" id="serials" oninput="setSettings()" 
+                    sdListTextProperty="displayName" sdListValueProperty="comPort" sdValueField="key">
             </select>
         </div>
         <input class="sdpi-item-value sdProperty" type="hidden" id="id" oninput="setSettings();" />

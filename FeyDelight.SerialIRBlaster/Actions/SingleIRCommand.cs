@@ -14,71 +14,27 @@ using FeyDelight.SerialIRBlaster.Common;
 using System.Security.Authentication;
 using FeyDelight.SerialIRBlaster.Common.SerialMessages;
 using System.Xml.Linq;
+using FeyDelight.SerialIRBlaster.PluginSettings;
 
 namespace FeyDelight.SerialIRBlaster.Actions
 {
     [PluginActionId("com.feydelight.serialirblaster.singleircommand")]
-    class SingleIRCommand : SerialIRBlasterBase
+    class SingleIRCommand : SerialIRBlasterBase<SingleIRPluginSettings>
     {
-        private class PluginSettings : SerialPortRequester
-        {
-            public PluginSettings(Guid ID)
-                : base(ID)
-            {
 
-            }
-            public static PluginSettings CreateDefaultSettings(Guid ID)
-            {
-                return new PluginSettings(ID)
-                {
-                    Protocol = ProtocolEnum.NEC.ToString(),
-                    Address = null,
-                    Command = null,
-                };
-            }
-
-            [JsonProperty(PropertyName = "protocol")]
-            public string Protocol { get; set; }
-
-            [JsonProperty(PropertyName = "address")]
-            public string Address { get; set; }
-
-            [JsonProperty(PropertyName = "command")]
-            public string Command { get; set; }
-
-        }
-
-        private readonly PluginSettings settings;
-        private Guid ID { get; } = Guid.NewGuid();
-
+        protected override SingleIRPluginSettings Settings { get; set; }
+        
         public SingleIRCommand(SDConnection connection, InitialPayload payload)
             : base(connection, payload)
         {
-            if (payload.Settings == null || payload.Settings.Count == 0)
-            {
-                this.settings = PluginSettings.CreateDefaultSettings(ID);
-                Connection.SetSettingsAsync(JObject.FromObject(settings));
-            }
-            else
-            {
-                this.settings = payload.Settings.ToObject<PluginSettings>();
-                if (this.settings.ID == Guid.Empty)
-                {
-                    this.settings.ID = ID;
-                    SaveSettings();
-                }
-                else
-                {
-                    this.ID = this.settings.ID;
-                }
-            }
-            base.TryToGetPort(this.settings);
+            SaveSettings();
+            base.TryToGetPort();
         }
 
         public async override void KeyPressed(KeyPayload payload)
         {
             Logger.Instance.LogMessage(TracingLevel.INFO, $"{this.GetType()} {nameof(KeyPressed)}");
-            var serialPort = Program.SerialPortManager.GetSerialPort(settings);
+            var serialPort = Program.SerialPortManager.GetSerialPort(Settings);
             if (serialPort == null)
             {
                 await Connection.ShowAlert();
@@ -89,7 +45,7 @@ namespace FeyDelight.SerialIRBlaster.Actions
             IRBlastSerialMessage message;
             try
             {
-                message = IRBlastSerialMessage.FromString(settings.Protocol, settings.Address, settings.Command, "0");
+                message = IRBlastSerialMessage.FromString(Settings.Protocol, Settings.Address, Settings.Command, "0");
                 if (message == null)
                 {
                     throw new Exception();
@@ -99,7 +55,7 @@ namespace FeyDelight.SerialIRBlaster.Actions
             {
                 Logger.Instance.LogMessage(TracingLevel.ERROR, $"Failed to get message out of settings");
                 Logger.Instance.LogMessage(TracingLevel.ERROR, $"{e}");
-                Logger.Instance.LogMessage(TracingLevel.ERROR, JsonConvert.SerializeObject(settings));
+                Logger.Instance.LogMessage(TracingLevel.ERROR, JsonConvert.SerializeObject(Settings));
                 await Connection.ShowAlert();
                 return;
             }
@@ -122,23 +78,15 @@ namespace FeyDelight.SerialIRBlaster.Actions
         {
             base.Dispose();
             Logger.Instance.LogMessage(TracingLevel.INFO, "Destructor called");
-            Program.SerialPortManager.CloseSerialPort(settings);
+            Program.SerialPortManager.CloseSerialPort(Settings);
         }
 
         public override async void ReceivedSettings(ReceivedSettingsPayload payload)
         {
-            Logger.Instance.LogMessage(TracingLevel.INFO, $"{this.GetType()} {nameof(ReceivedSettings)}");
-            Tools.AutoPopulateSettings(settings, payload.Settings);
+            base.ReceivedSettings(payload);
             await SaveSettings();
         }
 
-        public override void ReceivedGlobalSettings(ReceivedGlobalSettingsPayload payload)
-        {
-        }
 
-        private Task SaveSettings()
-        {
-            return Connection.SetSettingsAsync(JObject.FromObject(settings));
-        }
     }
 }

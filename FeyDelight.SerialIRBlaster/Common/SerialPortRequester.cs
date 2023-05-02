@@ -7,8 +7,11 @@ using System.Threading.Tasks;
 
 namespace FeyDelight.SerialIRBlaster.Common
 {
-    internal abstract class SerialPortRequester
+    internal abstract class SerialPortRequester : ISerialPortRequester
     {
+
+        [JsonProperty(PropertyName = "serials")]
+        public List<SerialPortSettings> Serials { get; set; }
 
         [JsonProperty(PropertyName = "key")]
         public string Key { get; set; }
@@ -27,9 +30,10 @@ namespace FeyDelight.SerialIRBlaster.Common
             }
         }
 
-        public SerialPortRequester(Guid ID)
+        public SerialPortRequester()
         {
-            this.ID = ID;
+            ID = Guid.NewGuid();
         }
+
     }
 }

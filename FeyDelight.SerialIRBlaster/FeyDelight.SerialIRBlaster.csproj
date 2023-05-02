@@ -53,6 +53,8 @@
     <Compile Include="Actions\DecodeCommand.cs" />
     <Compile Include="Actions\SingleIRCommand.cs" />
     <Compile Include="Common\ISerialPortManager.cs" />
+    <Compile Include="Common\ISerialPortRequester.cs" />
+    <Compile Include="Common\ISerialPortSettings.cs" />
     <Compile Include="Common\SerialMessages\ISerialMessage.cs" />
     <Compile Include="Common\ProtocolEnum.cs" />
     <Compile Include="Common\SerialMessages\IRBlastSerialMessage.cs" />
@@ -63,6 +65,10 @@
     <Compile Include="Common\SerialPortManager.cs" />
     <Compile Include="Common\SerialPortRequester.cs" />
     <Compile Include="Common\SerialPortSettings.cs" />
+    <Compile Include="PluginSettings\DecodePluginSettings.cs" />
+    <Compile Include="PluginSettings\DisconnectAllPluginSettings.cs" />
+    <Compile Include="PluginSettings\MultiIRPluginSettings.cs" />
+    <Compile Include="PluginSettings\SingleIRPluginSettings.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

@@ -15,20 +15,20 @@ namespace FeyDelight.SerialIRBlaster.Common
         /// </summary>
         /// <param name="Requester"></param>
         /// <returns>Returns null if the port failed to open</returns>
-        SerialPort GetSerialPort(SerialPortRequester Requester);
+        SerialPort GetSerialPort(ISerialPortRequester Requester);
         
         /// <summary>
         /// Closes a serial port. Continues to keep record of the settings for future use
         /// </summary>
         /// <param name="Requester"></param>
-        void CloseSerialPort(SerialPortRequester Requester);
+        void CloseSerialPort(ISerialPortRequester Requester);
         
         /// <summary>
         /// Adds serial port settings to the list of available serialports
         /// </summary>
         /// <param name="Settings"></param>
         /// <returns>true if a serial was added, false otherwise</returns>
-        bool AddSerialPort(SerialPortSettings Settings);
+        bool AddSerialPort(ISerialPortSettings Settings);
 
         /// <summary>
         /// Removes serial port and its connection information
