@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace FeyDelight.SerialIRBlaster.Common
 {
-    internal class SerialPortSettings 
+    internal class SerialPortSettings : ISerialPortSettings
     {
         [JsonProperty(PropertyName = "displayName")]
         public string DisplayName { get; set; }
@@ -89,7 +89,7 @@ namespace FeyDelight.SerialIRBlaster.Common
             {
                 throw new ArgumentException(nameof(stopBit));
             }
-            
+
             return new SerialPortSettings
             {
                 DisplayName = displayName,
@@ -111,7 +111,7 @@ namespace FeyDelight.SerialIRBlaster.Common
             {
                 return true;
             }
-            var other = obj as SerialPortSettings;
+            var other = obj as ISerialPortSettings;
             return
                 this.DisplayName == other.DisplayName &&
                 this.ComPort.Equals(other.ComPort) &&
@@ -126,14 +126,14 @@ namespace FeyDelight.SerialIRBlaster.Common
         {
             return
                 DisplayName.GetHashCode() ^
-                ComPort.GetHashCode() ^ 
-                BaudRate.GetHashCode() ^ 
+                ComPort.GetHashCode() ^
+                BaudRate.GetHashCode() ^
                 DataBits.GetHashCode() ^
-                Parity.GetHashCode() ^ 
+                Parity.GetHashCode() ^
                 StopBit.GetHashCode();
         }
 
-        public bool IsSettingChanging(SerialPortSettings other)
+        public bool IsSettingChanging(ISerialPortSettings other)
         {
             return !
                 (this.ComPort.Equals(other.ComPort) &&
