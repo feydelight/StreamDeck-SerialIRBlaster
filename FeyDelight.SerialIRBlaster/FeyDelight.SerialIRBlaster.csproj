@@ -94,12 +94,10 @@
     <Content Include="Images\singleIRIcon.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="install.bat">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
     <Content Include="manifest.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="install.ps1" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Images\categoryIcon%402x.png">
@@ -165,7 +163,6 @@
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>
-    </PostBuildEvent>
+    <PostBuildEvent>powershell -File "$(ProjectDir)install.ps1" -exeName "$(TargetFileName)" -ProjectBuild "$(OutDir.TrimEnd('\'))"</PostBuildEvent>
   </PropertyGroup>
 </Project>
