@@ -34,7 +34,7 @@ namespace FeyDelight.SerialIRBlaster.Actions
         public async override void KeyPressed(KeyPayload payload)
         {
             Logger.Instance.LogMessage(TracingLevel.INFO, $"{this.GetType()} {nameof(KeyPressed)}");
-            var serialPort = Program.SerialPortManager.GetSerialPort(Settings);
+            var serialPort = Program.SerialPortManager.GetSerialPort(Settings, SerialPort_DataReceived);
             if (serialPort == null)
             {
                 await Connection.ShowAlert();
@@ -67,7 +67,6 @@ namespace FeyDelight.SerialIRBlaster.Actions
         public override void KeyReleased(KeyPayload payload)
         {
         }
-
 
         public override void OnTick()
         {

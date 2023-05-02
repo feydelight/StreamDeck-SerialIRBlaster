@@ -14,7 +14,7 @@ namespace FeyDelight.SerialIRBlaster.Common
         private class SerialPortCache
         {
             public SerialPort SerialPort { get; set; }
-            public HashSet<Guid> ConnectedActions { get; set; }
+            public Dictionary<Guid, ReplyDelegate> ConnectedActions { get; set; }
             public ISerialPortSettings SerialPortSettings { get; set; }
         }
 
@@ -53,7 +53,7 @@ namespace FeyDelight.SerialIRBlaster.Common
                 {
                     PortCaches.Add(key, new SerialPortCache
                     {
-                        ConnectedActions = new HashSet<Guid>(),
+                        ConnectedActions = new Dictionary<Guid, ReplyDelegate>(),
                         SerialPort = null,
                         SerialPortSettings = settings
                     });
@@ -82,7 +82,7 @@ namespace FeyDelight.SerialIRBlaster.Common
             }
         }
 
-        public SerialPort GetSerialPort(ISerialPortRequester requester)
+        public SerialPort GetSerialPort(ISerialPortRequester requester, ReplyDelegate replyDelegate)
         {
             var key = requester.Key;
             if (string.IsNullOrEmpty(key))
@@ -96,6 +96,7 @@ namespace FeyDelight.SerialIRBlaster.Common
             }
             lock (dictLock)
             {
+                Logger.Instance.LogMessage(TracingLevel.INFO, $"ID {requester.ID} requesting port: {key}");
                 if (PortCaches.TryGetValue(key, out var portCache) == false)
                 {
                     Logger.Instance.LogMessage(TracingLevel.INFO, $"Requesting port that doesn't exist or has been deleted {requester.ID}");
@@ -116,15 +117,18 @@ namespace FeyDelight.SerialIRBlaster.Common
                         return null;
                     }
                 }
-                portCache.ConnectedActions.Add(requester.ID);
+                portCache.ConnectedActions[requester.ID] = replyDelegate;
 
                 if (portCache.SerialPort.IsOpen == false)
                 {
                     try
                     {
+                        Logger.Instance.LogMessage(TracingLevel.INFO, $"Adding DataReceived hook to {portCache.SerialPort.PortName}...");
+                        portCache.SerialPort.DataReceived += SerialPort_DataReceived;
+                        Logger.Instance.LogMessage(TracingLevel.INFO, $"Successfully added hook to {portCache.SerialPort.PortName}.");
                         Logger.Instance.LogMessage(TracingLevel.INFO, $"Opening port {portCache.SerialPort.PortName}...");
                         portCache.SerialPort.Open();
-                        Logger.Instance.LogMessage(TracingLevel.INFO, $"Port {portCache.SerialPort.PortName} opened.");
+                        Logger.Instance.LogMessage(TracingLevel.INFO, $"Port {portCache.SerialPort.PortName} opened.");                        
                     }
                     catch (Exception e)
                     {
@@ -133,6 +137,42 @@ namespace FeyDelight.SerialIRBlaster.Common
                     }
                 }
                 return portCache.SerialPort;
+            }
+        }
+        private void SerialPort_DataReceived(object sender, SerialDataReceivedEventArgs e)
+        {
+            SerialPort sp = (SerialPort)sender;
+            try
+            {
+                string indata = sp.ReadLine().Trim();
+                if (string.IsNullOrEmpty(indata))
+                {
+                    return;
+                }
+                lock(dictLock)
+                {
+                    string key = sp.PortName;
+                    if (PortCaches.TryGetValue(key, out var portCache) == false)
+                    {
+                        Logger.Instance.LogMessage(TracingLevel.INFO, $"Port {key} sent messages after it was asked to be closed.");
+                        return;
+                    }
+                    //Logger.Instance.LogMessage(TracingLevel.INFO, $"Serial replied: '{indata}'");
+                    foreach(var action in portCache.ConnectedActions)
+                    {
+                        if (action.Value == null)
+                        {
+                            continue;
+                        }
+                        //Logger.Instance.LogMessage(TracingLevel.INFO, $"Sending it to: {action.Key}");
+                        action.Value.Invoke(sp, indata);
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                // either timed out, or the port got closed. either way, no biggy.
+                return;
             }
         }
 
